@@ -5,13 +5,30 @@
 ## main
 ##
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
+import pymysql as sql
+
 app = Flask(__name__)
 app.config.from_object('config')
 
 @app.route('/connection')
 def connetion():
     return 'connection'
+
+@app.route('/users')
+def get_all_users():
+    result = ""
+    try: 
+        connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
+        cursor = connect.cursor()
+        cursor.execute("SELECT * from user")
+        result = cursor.fetchall()
+        cursor.close
+        connect.close
+    except Exception as e:
+        print("Error: ", e)
+    print("result :", result)    
+    return jsonify(result)
 
 @app.route('/')
 def index():
