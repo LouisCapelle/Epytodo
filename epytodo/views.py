@@ -26,8 +26,22 @@ def get_all_users():
         cursor.close
         connect.close
     except Exception as e:
+        print("Error: ", e)  
+    return jsonify(result)
+
+@app.route('/tasks')
+def get_all_tasks():
+    result = ""
+    try: 
+        connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
+        cursor = connect.cursor()
+        cursor.execute("SELECT * from task")
+        result = cursor.fetchall()
+        cursor.close
+        connect.close
+    except Exception as e:
         print("Error: ", e)
-    print("result :", result)    
+    print(result)
     return jsonify(result)
 
 @app.route('/')
