@@ -16,6 +16,10 @@ connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock
 def connetion():
     return 'connection'
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/users')
 def get_all_users():
     result = ""
@@ -64,9 +68,28 @@ def register_user():
         return "REGISTER_ERR"
     return 0
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/task/add', methods=['POST'])
+def create_task():
+    result = ""
+    data = request.get_json()
+    if request.method == 'POST':
+        try:
+            title = data['title']
+            begin = data['begin']
+            end = data['end']
+            status = data['status']
+            cursor = connect.cursor()
+            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s)', (title, begin, end, status))
+            connect.commit()
+            cursor.close
+            connect.close
+            return "TASK_ID_ADD_RES"
+        except Exception as error:
+            print("Error: ", error)
+            return "TASK_ID_ADD_ERR"
+    else:
+        return "TASK_ID_ADD_ERR"
+    return 0
 
 if __name__ == "__main__":
     app.run()
