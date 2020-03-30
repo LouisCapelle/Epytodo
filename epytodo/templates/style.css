@@ -1,0 +1,58 @@
+link {
+    display: none;
+}
+
+html {
+    background-color: rgb(137, 134, 144);
+}
+
+.name {
+    text-align: center;
+    list-style-type: none;
+    color: black;
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.box {
+    margin-top: 50px;
+    border: 5px solid rgb(230, 223, 185);
+    background-color: lightgray;
+    margin-left: auto;
+    margin-right: auto;
+    width: 250px;
+    height: 250px;
+}
+
+.password {
+    text-align: center;
+    list-style-type: none;
+    font-size: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: black;
+    display: block;
+}
+
+h1 {
+    text-align: center;
+    width: 200px;
+    margin: 0 auto;
+    background-color: rgb(255, 255, 255);
+    width: 200px;
+    height: 50px;
+    border: 4px solid black;
+}
+
+h3 {
+    text-align: center;
+    text-decoration: underline;
+    color : #413e3d;
+}
+
+form {
+    color: white;
+}
