@@ -91,5 +91,23 @@ def create_task():
         return "TASK_ID_ADD_ERR"
     return 0
 
+@app.route('/task/<int:id>', methods=['GET'])
+def view_task_id(id):
+    result: str = None
+    try:
+        cursor = connect.cursor()
+        cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
+        result = cursor.fetchall()
+        cursor.close()
+        connect.close()
+        print(id)
+        print(result)
+        return jsonify(result)
+    except Exception as error:
+        print(id)
+        print(result)
+        print("Error: ", error)
+        return "error"
+
 if __name__ == "__main__":
     app.run()
