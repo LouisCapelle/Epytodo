@@ -13,7 +13,7 @@ app.config.from_object('config')
 connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
 
 def check_user_exists(username: str):
-    temp: str = ""
+    temp: str = None
     try:
         cursor = connect.cursor()
         cursor.execute("SELECT COUNT(1) FROM user WHERE username = '{}';".format(username))
@@ -36,7 +36,7 @@ def register_user():
         password = data['password']
         if (check_user_exists(username) == True):
             result['error'] = "account already exists"
-            return result
+            return jsonify(result)
         else:
             cursor = connect.cursor()
             cursor.execute("INSERT INTO user (username, password) VALUES ('{}', '{}');".format(username, password))
@@ -44,11 +44,11 @@ def register_user():
             cursor.close
             connect.close
             result['result'] = "account created"
-            return result
+            return jsonify(result)
     except Exception as error:
         print(error)
         result['error'] = "internal error"
-        return result
+        return jsonify(result)
 
 @app.route('/task/add', methods=['POST'])
 def create_task():
@@ -96,9 +96,8 @@ def check_is_correct_password(username: str, password: str):
     result = cursor.fetchall()
     cursor.close
     connect.close
-    if result:
-        if (get_password(username) == password):
-            return True
+    if result[0][0] > 0 and get_password(username) == password:
+        return True
     else:
         return False
 
@@ -109,23 +108,29 @@ def get_password(username: str):
     cursor.close
     connect.close
     return(password[0][0])
-    
 
 @app.route('/signin', methods=['POST'])
 def signin_user():
-    result: str = None
+    result: dict = {}
     data = request.get_json()
     try:
         username = data['username']
         password = data['password']
-        if check_is_correct_password(username, password):
+        print(check_is_correct_password(username, password))
+        if (check_is_correct_password(username, password) and app.config['IS_SIGNED'] == False):
             app.config['IS_SIGNED'] = True
-            return "signin successful"
+            result['result'] = "signin successful"
+            return jsonify(result)
+        elif app.config['IS_SIGNED']:
+            result['error'] = "you're already signed"
+            return jsonify(result)
         else:
-            return "error"
+            result['error'] = "login or password does not match"
+            return jsonify(result)
     except Exception as error:
-        print("Error: ", error)
-        return "error"
+        print(error)
+        result['error'] = "internal error"
+        return jsonify(result)
 
 @app.route('/signout', methods=['POST'])
 def signout_user():
