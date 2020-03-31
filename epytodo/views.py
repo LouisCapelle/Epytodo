@@ -98,14 +98,13 @@ def view_task_id(id):
         cursor = connect.cursor()
         cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
         result = cursor.fetchall()
-        cursor.close()
-        connect.close()
-        print(id)
-        print(result)
-        return jsonify(result)
+        cursor.close
+        connect.close
+        if result:
+            return jsonify(result)
+        else:
+            return "error"
     except Exception as error:
-        print(id)
-        print(result)
         print("Error: ", error)
         return "error"
 
