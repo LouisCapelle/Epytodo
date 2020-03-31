@@ -116,7 +116,6 @@ def signin_user():
     try:
         username = data['username']
         password = data['password']
-        print(check_is_correct_password(username, password))
         if (check_is_correct_password(username, password) and app.config['IS_SIGNED'] == False):
             app.config['IS_SIGNED'] = True
             result['result'] = "signin successful"
@@ -128,21 +127,23 @@ def signin_user():
             result['error'] = "login or password does not match"
             return jsonify(result)
     except Exception as error:
-        print(error)
         result['error'] = "internal error"
         return jsonify(result)
 
 @app.route('/signout', methods=['POST'])
 def signout_user():
+    result: dict = {}
     try:
-        if app.config['IS_SIGNED'] == 1:
-            app.config['IS_SIGNED'] = 0
-            return "signout successfull"
+        if app.config['IS_SIGNED']:
+            app.config['IS_SIGNED'] = False
+            result['result'] = "signout successful"
+            return jsonify(result)
         else:
-            return "you must be logged"
+            result['error'] = "you must be logged in"
+            return jsonify(result)
     except Exception as error:
-        print("Error: ", error)
-        return "error"
+        result['error'] = "internal error"
+        return jsonify(result)
 
 if __name__ == "__main__":
     app.run()
