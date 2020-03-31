@@ -11,8 +11,7 @@ import pymysql as sql
 app = Flask(__name__)
 app.config.from_object('config')
 connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
-
-is_signed: bool = False
+is_signed: int = 0
 
 @app.route('/connection')
 def connetion():
@@ -140,10 +139,22 @@ def signin_user():
         password = data['password']
         check_user(username, password)
         if check_user(username, password):
-            is_signed = True
+            app.config['IS_SIGNED'] = True
             return "signin successful"
         else:
             return "error"
+    except Exception as error:
+        print("Error: ", error)
+        return "error"
+
+@app.route('/signout', methods=['POST'])
+def signout_user():
+    try:
+        if app.config['IS_SIGNED'] == 1:
+            app.config['IS_SIGNED'] = 0
+            return "signout successfull"
+        else:
+            return "you must be logged"
     except Exception as error:
         print("Error: ", error)
         return "error"
