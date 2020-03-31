@@ -52,9 +52,9 @@ def register_user():
 
 @app.route('/task/add', methods=['POST'])
 def create_task():
-    result = ""
+    result: dict = {}
     data = request.get_json()
-    if request.method == 'POST':
+    if app.config['IS_SIGNED']:
         try:
             title = data['title']
             begin = data['begin']
@@ -65,12 +65,14 @@ def create_task():
             connect.commit()
             cursor.close
             connect.close
-            return "TASK_ID_ADD_RES"
+            result['result'] = "new task added"
+            return jsonify(result)
         except Exception as error:
-            print("Error: ", error)
-            return "TASK_ID_ADD_ERR"
+            result['error'] = "internal error"
+            return jsonify(result)
     else:
-        return "TASK_ID_ADD_ERR"
+        result['error'] = "you must be logged in"
+        return jsonify(result)
     return 0
 
 @app.route('/task/<int:id>', methods=['GET'])
