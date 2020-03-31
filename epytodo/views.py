@@ -12,6 +12,8 @@ app = Flask(__name__)
 app.config.from_object('config')
 connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
 
+is_signed: bool = False
+
 @app.route('/connection')
 def connetion():
     return 'connection'
@@ -102,6 +104,44 @@ def view_task_id(id):
         connect.close
         if result:
             return jsonify(result)
+        else:
+            return "error"
+    except Exception as error:
+        print("Error: ", error)
+        return "error"
+
+def check_user(username: str, password: str):
+    cursor = connect.cursor()
+    cursor.execute("SELECT COUNT(1) FROM user WHERE username = '{}';".format(username))
+    result = cursor.fetchall()
+    cursor.close
+    connect.close
+    if result:
+        if (check_password(username) == password):
+            return True
+    else:
+        return False
+
+def check_password(username: str):
+    cursor = connect.cursor()
+    cursor.execute("SELECT password FROM user WHERE username = '{}'".format(username))
+    password = cursor.fetchall()
+    cursor.close
+    connect.close
+    return(password[0][0])
+    
+
+@app.route('/signin', methods=['POST'])
+def signin_user():
+    result: str = None
+    data = request.get_json()
+    try:
+        username = data['username']
+        password = data['password']
+        check_user(username, password)
+        if check_user(username, password):
+            is_signed = True
+            return "signin successful"
         else:
             return "error"
     except Exception as error:
