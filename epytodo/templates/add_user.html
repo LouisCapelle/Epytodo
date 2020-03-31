@@ -3,33 +3,32 @@
     <head>
         <link rel="stylesheet" type="text/css" href="style.css">
         <meta charset="utf-8">
-        <title>&lt;Web&gt; EpyTodo</title>
+        <title>&lt;Web&gt; add_user</title>
     </head>
     <body>
         <br/>
-        <h1>CONNECTION</h1>
+        <h1>Sign Up</h1>
         <br/><br/><br/>
-        <hr><p>"Please login to your account."</p><hr>
+        <hr><p>"Please fill in this form to create an account."</p><hr>
         <br/><br/><br/>
-        <div class="box">
-            <h3>CONNECTION</h3>
+        <div class="box_two">
             <list class="name" >
                 <label for="name">Name</label>
                 <br/>
                 <input type="text" id="user_name" name="user_name">
             </list>
             <pre></pre>
-            <br/>
             <list class="password">
                 <label for="password">Password</label>
                 <br/>
-                <input type="password" id="password" name="user_password">
+                    <input type="password" id="password" name="user_password">
                 <pre></pre>
-                <br/>
-                <input type="submit" value="Valider" />
-            <form name="x" action="add_user.html" method="post">
-                <input type="submit" value="Sign up">
-                </form>
+                <list class="repeat"></list>
+                    <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
+                <pre></pre>
+                    <input type="checkbox" checked="checked" name="remember" style="margin-bottom:15px"> Remember me
+                <pre></pre>
+                    <input type="submit" value="Valider" />
             </list>
         </div>
     </body>
