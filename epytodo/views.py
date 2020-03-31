@@ -11,63 +11,44 @@ import pymysql as sql
 app = Flask(__name__)
 app.config.from_object('config')
 connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
-is_signed: int = 0
 
-@app.route('/connection')
-def connetion():
-    return 'connection'
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/users')
-def get_all_users():
-    result = ""
-    try: 
-        cursor = connect.cursor()
-        cursor.execute("SELECT * from user")
-        result = cursor.fetchall()
-        cursor.close
-        connect.close
-    except Exception as e:
-        print("Error: ", e)  
-    return jsonify(result)
-
-@app.route('/tasks')
-def get_all_tasks():
-    result = ""
+def check_user_exists(username: str):
+    temp: str = ""
     try:
         cursor = connect.cursor()
-        cursor.execute("SELECT * from task")
-        result = cursor.fetchall()
+        cursor.execute("SELECT COUNT(1) FROM user WHERE username = '{}';".format(username))
+        temp = cursor.fetchall()
         cursor.close
         connect.close
+        if int(temp[0][0]) > 0:
+            return True
+        else:
+            return False
     except Exception as error:
-        print("Error: ", error)
-        return (error)
-    return jsonify(result)
+        print(error)
 
 @app.route('/register', methods=['POST'])
 def register_user():
-    result = ""
+    result:dict = {}
     data = request.get_json()
-    if request.method == 'POST':
-        try:
-            username = data['username']
-            password = data['password']
+    try:
+        username = data['username']
+        password = data['password']
+        if (check_user_exists(username) == True):
+            result['error'] = "account already exists"
+            return result
+        else:
             cursor = connect.cursor()
-            cursor.execute('INSERT INTO user (username, password) VALUES (%s, %s)', (username, password))
+            cursor.execute("INSERT INTO user (username, password) VALUES ('{}', '{}');".format(username, password))
             connect.commit()
             cursor.close
             connect.close
-            return "REGISTER_RES"
-        except Exception as error:
-            print("Error: ", error)
-            return "REGISTER_ERR"
-    else:
-        return "REGISTER_ERR"
-    return 0
+            result['result'] = "account created"
+            return result
+    except Exception as error:
+        print(error)
+        result['error'] = "internal error"
+        return result
 
 @app.route('/task/add', methods=['POST'])
 def create_task():
@@ -80,7 +61,7 @@ def create_task():
             end = data['end']
             status = data['status']
             cursor = connect.cursor()
-            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s)', (title, begin, end, status))
+            cursor.execute("INSERT INTO task (title, begin, end, status) VALUES ({}, {}, {}, {});".format(title, begin, end, status))
             connect.commit()
             cursor.close
             connect.close
@@ -109,21 +90,21 @@ def view_task_id(id):
         print("Error: ", error)
         return "error"
 
-def check_user(username: str, password: str):
+def check_is_correct_password(username: str, password: str):
     cursor = connect.cursor()
     cursor.execute("SELECT COUNT(1) FROM user WHERE username = '{}';".format(username))
     result = cursor.fetchall()
     cursor.close
     connect.close
     if result:
-        if (check_password(username) == password):
+        if (get_password(username) == password):
             return True
     else:
         return False
 
-def check_password(username: str):
+def get_password(username: str):
     cursor = connect.cursor()
-    cursor.execute("SELECT password FROM user WHERE username = '{}'".format(username))
+    cursor.execute("SELECT password FROM user WHERE username = '{}';".format(username))
     password = cursor.fetchall()
     cursor.close
     connect.close
@@ -137,8 +118,7 @@ def signin_user():
     try:
         username = data['username']
         password = data['password']
-        check_user(username, password)
-        if check_user(username, password):
+        if check_is_correct_password(username, password):
             app.config['IS_SIGNED'] = True
             return "signin successful"
         else:
