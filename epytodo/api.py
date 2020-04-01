@@ -49,7 +49,7 @@ def register_user():
         result['error'] = "internal error"
         return jsonify(result)
 
-@app.route('/task/add', methods=['POST'])
+@app.route('/user/task/add', methods=['POST'])
 def create_task():
     result: dict = {}
     data = request.get_json()
@@ -84,8 +84,8 @@ def get_task_result_json(res: str):
     result['result'] = data
     return jsonify(result)
 
-@app.route('/task/<int:id>', methods=['GET'])
-def view_task_id(id):
+@app.route('/user/task/<int:id>', methods=['GET'])
+def view_task_id(id: int):
     result: str = None
     error: dict = {}
     if app.config['IS_SIGNED']:
@@ -161,3 +161,40 @@ def signout_user():
     except Exception as error:
         result['error'] = "internal error"
         return jsonify(result)
+
+def delete_request(id: int):
+    result: dict = {}
+    try:
+        cursor = connect.cursor()
+        cursor.execute("DELETE FROM task WHERE task_id = {};".format(id))
+        connect.commit()
+        cursor.close
+        connect.close
+        result['result'] = "task deleted"
+        return jsonify(result)
+    except Exception as error:
+        result['error'] = "internal error"
+        return jsonify(result)
+
+@app.route('/user/task/del/<int:id>', methods=['POST'])
+def delete_task_id(id: int):
+    result: dict = {}
+    if app.config['IS_SIGNED']:
+        try:
+            cursor = connect.cursor()
+            cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
+            data = cursor.fetchone()
+            cursor.close
+            connect.close
+            if data:
+                return delete_request(id)
+            else:
+                result['error'] = "task id does not exists"
+                return jsonify(result)
+        except Exception as error:
+            result['error'] = "internal error"
+            return jsonify(result)
+    else:
+        result['error'] = "you must be logged in"
+        return jsonify(result)
+    return
