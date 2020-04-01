@@ -75,22 +75,38 @@ def create_task():
         return jsonify(result)
     return 0
 
+def get_task_result_json(res: str):
+    result: dict = {}
+    data: dict = {}
+    data['title'] = res[1]
+    data['begin'] = res[2]
+    data['end'] = res[3]
+    data['status'] = res[4]
+    result['result'] = data
+    return jsonify(result)
+
 @app.route('/task/<int:id>', methods=['GET'])
 def view_task_id(id):
     result: str = None
-    try:
-        cursor = connect.cursor()
-        cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
-        result = cursor.fetchall()
-        cursor.close
-        connect.close
-        if result:
-            return jsonify(result)
-        else:
-            return "error"
-    except Exception as error:
-        print("Error: ", error)
-        return "error"
+    error: dict = {}
+    if app.config['IS_SIGNED']:
+        try:
+            cursor = connect.cursor()
+            cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
+            result = cursor.fetchone()
+            cursor.close
+            connect.close
+            if result:
+                return get_task_result_json(result)
+            else:
+                error['error'] = "task id does not exists"
+                return jsonify(error)
+        except Exception as error:
+            error['error'] = "internal error"
+            return jsonify(error)
+    else:
+        error['error'] = "you must be logged in"
+        return jsonify(error)
 
 def check_is_correct_password(username: str, password: str):
     cursor = connect.cursor()
