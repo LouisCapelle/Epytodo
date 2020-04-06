@@ -60,7 +60,7 @@ def create_task():
             end = data['end']
             status = data['status']
             cursor = connect.cursor()
-            cursor.execute("INSERT INTO task (title, begin, end, status) VALUES ({}, {}, {}, {});".format(title, begin, end, status))
+            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s)', (title, begin, end, status))
             connect.commit()
             cursor.close
             connect.close
@@ -68,6 +68,7 @@ def create_task():
             return jsonify(result)
         except Exception as error:
             result['error'] = "internal error"
+            print(error)
             return jsonify(result)
     else:
         result['error'] = "you must be logged in"
@@ -188,6 +189,33 @@ def delete_task_id(id: int):
             connect.close
             if data:
                 return delete_request(id)
+            else:
+                result['error'] = "task id does not exists"
+                return jsonify(result)
+        except Exception as error:
+            result['error'] = "internal error"
+            return jsonify(result)
+    else:
+        result['error'] = "you must be logged in"
+        return jsonify(result)
+    return
+
+def mod_task():
+    return 
+
+@app.route('/user/task/<int:id>', methods=['POST'])
+def modify_task_id(id: int):
+    result: dict = {}
+    data = request.get_json()
+    if app.config['IS_SIGNED']:
+        try:
+            cursor = connect.cursor()
+            cursor.execute("UPDATE task SET title = '{}', begin = '{}', end = '{}', status = '{}' WHERE id = {};".format(id))
+            data = cursor.fetchone()
+            cursor.close
+            connect.close
+            if data:
+                return mod_task(id)
             else:
                 result['error'] = "task id does not exists"
                 return jsonify(result)
