@@ -3,7 +3,8 @@ link {
 }
 
 html {
-    background-color: rgb(137, 134, 144);
+    background-color: #008080;
+    background-repeat: repeat-x;
 }
 
 .name {
@@ -34,6 +35,47 @@ html {
     margin-right: auto;
     width: 250px;
     height: 350px;
+}
+
+i {
+    margin-left: auto;
+    color: black;
+}
+
+input {
+    border-left: 10px solid rgb(202, 163, 32);
+    font-size: 18px;
+    background-color: lightgrey;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 20;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+    border-right: 1px solid grey;
+}
+
+li a {
+    font-size: 25px;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 20px 16px;
+    text-decoration: none;
+}
+
+.active {
+    background-color: #4CAF50;
+}
+
+li a:hover {
+    background-color: #111;
 }
 
 p {
@@ -77,15 +119,18 @@ fieldset {
 
 h1 {
     font-size: 50px;
+    display: block;
     text-align: center;
     margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.815);
-    width: 380px;
-    height: 60px;
-    border: 4px solid black;
+    color: white;
+    background-color: rgb(56, 55, 55);
+    width: 400px;
+    height: 80px;
+    border: 4px solid rgb(201, 168, 20);
 }
 
 label  {
+    margin-left: 0px;
     font-size: 25px;
 }
 
