@@ -1,7 +1,7 @@
 DATABASE_NAME = "epytodo"
 DATABASE_HOST = "127.0.0.1"
 DATABASE_SOCK = None
-DATABASE_USER = "root"    
-DATABASE_PASS = ""
+DATABASE_USER = "epy"    
+DATABASE_PASS = "mabite"
 IS_SIGNED = False
 SESSION_ID = 0
