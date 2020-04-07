@@ -146,11 +146,11 @@ def signin_user():
     try:
         username = data['username']
         password = data['password']
-        if (check_is_correct_password(username, password) and app.config['IS_SIGNED'] == False):
+        if (check_is_correct_password(username, password) and 'id' in session):
             session['id'] = get_user_id(username)
             result['result'] = "signin successful"
             return jsonify(result)
-        elif app.config['IS_SIGNED']:
+        elif 'id' in session:
             result['error'] = "you're already signed"
             return jsonify(result)
         else:
