@@ -78,11 +78,6 @@ li a:hover {
     background-color: #111;
 }
 
-p {
-    font-size: 30px;
-    text-align: center;
-}
-
 .password {
     text-align: center;
     list-style-type: none;
@@ -121,7 +116,6 @@ h1 {
     font-size: 50px;
     display: block;
     text-align: center;
-    margin: 0 auto;
     color: white;
     background-color: rgb(56, 55, 55);
     width: 400px;

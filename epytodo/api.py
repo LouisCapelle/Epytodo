@@ -9,7 +9,7 @@ from flask import Flask, render_template, jsonify, request
 import pymysql as sql
 from .views import app
 
-connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
+connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='epy', passwd='mabite', db='epytodo')
 
 def check_user_exists(username: str):
     temp: str = None
