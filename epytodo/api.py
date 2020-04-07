@@ -10,7 +10,7 @@ from datetime import timedelta
 import pymysql as sql
 from .views import app
 
-connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
+connect = sql.connect(host=app.config['DATABASE_HOST'], unix_socket=app.config['DATABASE_SOCK'], user=app.config['DATABASE_USER'], passwd=app.config['DATABASE_PASS'], db=app.config['DATABASE_NAME'])
 app.secret_key = "caca"
 app.permanent_session_lifetime = timedelta(minutes = 5)
 
