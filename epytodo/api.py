@@ -5,11 +5,14 @@
 ## api
 ##
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session
+from datetime import timedelta
 import pymysql as sql
 from .views import app
 
-connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='epy', passwd='mabite', db='epytodo')
+connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='root', passwd='root', db='epytodo')
+app.secret_key = "caca"
+app.permanent_session_lifetime = timedelta(minutes = 5)
 
 def check_user_exists(username: str):
     temp: str = None
@@ -53,7 +56,7 @@ def register_user():
 def create_task():
     result: dict = {}
     data = request.get_json()
-    if app.config['IS_SIGNED']:
+    if 'id' in session:
         try:
             title = data['title']
             begin = data['begin']
@@ -89,7 +92,7 @@ def get_task_result_json(res: str):
 def view_task_id(id: int):
     result: str = None
     error: dict = {}
-    if app.config['IS_SIGNED']:
+    if 'id' in session:
         try:
             cursor = connect.cursor()
             cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
@@ -102,6 +105,7 @@ def view_task_id(id: int):
                 error['error'] = "task id does not exists"
                 return jsonify(error)
         except Exception as error:
+            print(error)
             error['error'] = "internal error"
             return jsonify(error)
     else:
@@ -127,6 +131,14 @@ def get_password(username: str):
     connect.close
     return(password[0][0])
 
+def get_user_id(username: str):
+    cursor = connect.cursor()
+    cursor.execute("SELECT user_id FROM user WHERE username = '{}';".format(username))
+    id = cursor.fetchall()
+    cursor.close
+    connect.close
+    return(id[0][0])
+
 @app.route('/signin', methods=['POST'])
 def signin_user():
     result: dict = {}
@@ -135,7 +147,7 @@ def signin_user():
         username = data['username']
         password = data['password']
         if (check_is_correct_password(username, password) and app.config['IS_SIGNED'] == False):
-            app.config['IS_SIGNED'] = True
+            session['id'] = get_user_id(username)
             result['result'] = "signin successful"
             return jsonify(result)
         elif app.config['IS_SIGNED']:
@@ -146,14 +158,15 @@ def signin_user():
             return jsonify(result)
     except Exception as error:
         result['error'] = "internal error"
+        print(error)
         return jsonify(result)
 
 @app.route('/signout', methods=['POST'])
 def signout_user():
     result: dict = {}
     try:
-        if app.config['IS_SIGNED']:
-            app.config['IS_SIGNED'] = False
+        if 'id' in session:
+            session.pop('id', None)
             result['result'] = "signout successful"
             return jsonify(result)
         else:
@@ -180,7 +193,7 @@ def delete_request(id: int):
 @app.route('/user/task/del/<int:id>', methods=['POST'])
 def delete_task_id(id: int):
     result: dict = {}
-    if app.config['IS_SIGNED']:
+    if 'id' in session:
         try:
             cursor = connect.cursor()
             cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(id))
@@ -207,7 +220,7 @@ def mod_task():
 def modify_task_id(id: int):
     result: dict = {}
     data = request.get_json()
-    if app.config['IS_SIGNED']:
+    if 'id' in session:
         try:
             cursor = connect.cursor()
             cursor.execute("UPDATE task SET title = '{}', begin = '{}', end = '{}', status = '{}' WHERE id = {};".format(id))

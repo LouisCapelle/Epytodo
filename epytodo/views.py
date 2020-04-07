@@ -10,7 +10,6 @@ import pymysql as sql
 
 app = Flask(__name__)
 app.config.from_object('config')
-connect = sql.connect(host='localhost', unix_socket='/var/run/mysqld/mysqld.sock', user='epy', passwd='mabite', db='epytodo')
 
 @app.route('/', methods=['GET'])
 def index():
