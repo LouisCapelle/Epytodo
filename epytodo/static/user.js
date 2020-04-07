@@ -34,6 +34,7 @@ function signin()
             var obj = JSON.parse(this.responseText, function (key, value) {
                 if (key == "result") {
                   alert("You've been logged in");
+                  window.location.replace("/home");
                   return true;
                 }
                 if (key == "error" && value == "login or password does not match") {
