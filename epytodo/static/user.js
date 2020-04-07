@@ -1,11 +1,23 @@
 function create_user() {
     var username = document.getElementById('user_name').value;
     var password = document.getElementById('password').value;
+    var error = '{"error":"account already exists"}';
+    var success  = '{"result":"account created"}';
+    var internal  = '{"error":internal error"}';
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
          if (this.readyState == 4 && this.status == 200) {
-             alert(this.responseText);
+            var obj = JSON.parse(this.responseText, function (key, value) {
+                if (key == "result") {
+                  alert("Account has been crceated");
+                }
+                if (key == "error" && value == "account already exists") {
+                    alert("An account with this username already exists");
+                }else if (key == "error" && value == "internal error") {
+                    alert("An error has occured, try to re sign up.");
+                }
+              });
          }
     };
     xhttp.open("POST", "/register", true);
