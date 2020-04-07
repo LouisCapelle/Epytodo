@@ -146,7 +146,7 @@ def signin_user():
     try:
         username = data['username']
         password = data['password']
-        if (check_is_correct_password(username, password) and 'id' in session):
+        if (check_is_correct_password(username, password) and 'id' not in session):
             session['id'] = get_user_id(username)
             result['result'] = "signin successful"
             return jsonify(result)
