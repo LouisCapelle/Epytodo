@@ -14,6 +14,16 @@ connect = sql.connect(host=app.config['DATABASE_HOST'], unix_socket=app.config['
 app.secret_key = "caca"
 app.permanent_session_lifetime = timedelta(minutes = 5)
 
+def get_task_result_json(res: str):
+    result: dict = {}
+    data: dict = {}
+    data['title'] = res[1]
+    data['begin'] = res[2]
+    data['end'] = res[3]
+    data['status'] = res[4]
+    result['result'] = data
+    return jsonify(result)
+
 def check_user_exists(username: str):
     temp: str = None
     try:
@@ -55,6 +65,7 @@ def register_user():
 @app.route('/tasks_current_user', methods=['GET'])
 def get_all_task_from_user():
     result: dict = {}
+    data: dict = {}
     i = 0;
     if 'id' in session:
         try:
@@ -69,9 +80,13 @@ def get_all_task_from_user():
                 temp = cursor.fetchone()
                 cursor.close
                 connect.close
-                result[i] = temp
+                data['title'] = temp[1]
+                data['begin'] = temp[2]
+                data['end'] = temp[3]
+                data['status'] = temp[4]
+                result[i] = data
                 i += 1
-            return jsonify(result);
+            return result
         except Exception as error:
             return jsonify(error)
     else:
@@ -120,16 +135,6 @@ def create_task():
         result['error'] = "you must be logged in"
         return jsonify(result)
     return 0
-
-def get_task_result_json(res: str):
-    result: dict = {}
-    data: dict = {}
-    data['title'] = res[1]
-    data['begin'] = res[2]
-    data['end'] = res[3]
-    data['status'] = res[4]
-    result['result'] = data
-    return jsonify(result)
 
 @app.route('/user/task/<int:id>', methods=['GET'])
 def view_task_id(id: int):
