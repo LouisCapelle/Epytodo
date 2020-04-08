@@ -52,10 +52,35 @@ def register_user():
         result['error'] = "internal error"
         return jsonify(result)
 
+@app.route('/get', methods=['GET'])
+def get_all_task_from_user():
+    result: dict = {}
+    i = 0;
+    try:
+        cursor = connect.cursor()
+        cursor.execute('SELECT fk_task_id FROM user_has_task WHERE fk_user_id = 12;');
+        temp = cursor.fetchall()
+        cursor.close
+        connect.close
+        for ids in temp:
+            cursor = connect.cursor()
+            cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(ids[0]))
+            temp = cursor.fetchone()
+            cursor.close
+            connect.close
+            result[i] = temp
+            i += 1
+        return jsonify(result);
+    except Exception as error:
+        print(error)
+        return "caca"
+
 def get_task_id(title: str, status: str):
     try:
         cursor = connect.cursor()
         cursor.execute('SELECT task_id FROM task WHERE title = "{}" AND status = "{}";'.format(title, status))
+        cursor.close
+        connect.close
         result = cursor.fetchone()
         return result[0]
     except Exception as error:
@@ -254,4 +279,3 @@ def modify_task_id(id: int):
     else:
         result['error'] = "you must be logged in"
         return jsonify(result)
-    return
