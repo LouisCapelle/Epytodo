@@ -52,6 +52,16 @@ def register_user():
         result['error'] = "internal error"
         return jsonify(result)
 
+def get_task_id(title: str, status: str):
+    try:
+        cursor = connect.cursor()
+        cursor.execute('SELECT task_id FROM task WHERE title = "{}" AND status = "{}";'.format(title, status))
+        result = cursor.fetchone()
+        return result[0]
+    except Exception as error:
+        print("caca")
+        print(error)
+
 @app.route('/user/task/add', methods=['POST'])
 def create_task():
     result: dict = {}
@@ -63,7 +73,13 @@ def create_task():
             end = data['end']
             status = data['status']
             cursor = connect.cursor()
-            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s)', (title, begin, end, status))
+            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s);', (title, begin, end, status))
+            connect.commit()
+            cursor.close
+            connect.close
+            task_id = get_task_id(title, status)
+            cursor = connect.cursor()
+            cursor.execute('INSERT INTO user_has_task (fk_user_id, fk_task_id) VALUES (%s, %s);', (session['id'], task_id))
             connect.commit()
             cursor.close
             connect.close
