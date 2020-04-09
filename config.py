@@ -1,5 +1,5 @@
 DATABASE_NAME = "epytodo"
 DATABASE_HOST = "127.0.0.1"
 DATABASE_SOCK = "/var/run/mysqld/mysqld.sock"
-DATABASE_USER = "root"    
-DATABASE_PASS = "root"
+DATABASE_USER = "epy"    
+DATABASE_PASS = "mabite"
