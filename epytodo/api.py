@@ -8,8 +8,9 @@
 from flask import Flask, render_template, jsonify, request, session
 from datetime import timedelta
 import pymysql as sql
-from .views import app
 
+app = Flask(__name__)
+app.config.from_object('config')
 connect = sql.connect(host=app.config['DATABASE_HOST'], unix_socket=app.config['DATABASE_SOCK'], user=app.config['DATABASE_USER'], passwd=app.config['DATABASE_PASS'], db=app.config['DATABASE_NAME'])
 app.secret_key = "caca"
 app.permanent_session_lifetime = timedelta(minutes = 5)
@@ -60,37 +61,6 @@ def register_user():
     except Exception as error:
         print(error)
         result['error'] = "internal error"
-        return jsonify(result)
-
-@app.route('/tasks_current_user', methods=['GET'])
-def get_all_task_from_user():
-    result: dict = {}
-    data: dict = {}
-    i = 0;
-    if 'id' in session:
-        try:
-            cursor = connect.cursor()
-            cursor.execute('SELECT fk_task_id FROM user_has_task WHERE fk_user_id = {};'.format(session['id']));
-            temp = cursor.fetchall()
-            cursor.close
-            connect.close
-            for ids in temp:
-                cursor = connect.cursor()
-                cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(ids[0]))
-                temp = cursor.fetchone()
-                cursor.close
-                connect.close
-                data['title'] = temp[1]
-                data['begin'] = temp[2]
-                data['end'] = temp[3]
-                data['status'] = temp[4]
-                result[i] = data
-                i += 1
-            return result
-        except Exception as error:
-            return jsonify(error)
-    else:
-        result['error'] = "you must be logged in"
         return jsonify(result)
 
 def get_task_id(title: str, status: str):
