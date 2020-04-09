@@ -14,6 +14,16 @@ connect = sql.connect(host=app.config['DATABASE_HOST'], unix_socket=app.config['
 app.secret_key = "caca"
 app.permanent_session_lifetime = timedelta(minutes = 5)
 
+def get_task_result_json(res: str):
+    result: dict = {}
+    data: dict = {}
+    data['title'] = res[1]
+    data['begin'] = res[2]
+    data['end'] = res[3]
+    data['status'] = res[4]
+    result['result'] = data
+    return jsonify(result)
+
 def check_user_exists(username: str):
     temp: str = None
     try:
@@ -52,6 +62,48 @@ def register_user():
         result['error'] = "internal error"
         return jsonify(result)
 
+@app.route('/tasks_current_user', methods=['GET'])
+def get_all_task_from_user():
+    result: dict = {}
+    data: dict = {}
+    i = 0;
+    if 'id' in session:
+        try:
+            cursor = connect.cursor()
+            cursor.execute('SELECT fk_task_id FROM user_has_task WHERE fk_user_id = {};'.format(session['id']));
+            temp = cursor.fetchall()
+            cursor.close
+            connect.close
+            for ids in temp:
+                cursor = connect.cursor()
+                cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(ids[0]))
+                temp = cursor.fetchone()
+                cursor.close
+                connect.close
+                data['title'] = temp[1]
+                data['begin'] = temp[2]
+                data['end'] = temp[3]
+                data['status'] = temp[4]
+                result[i] = data
+                i += 1
+            return result
+        except Exception as error:
+            return jsonify(error)
+    else:
+        result['error'] = "you must be logged in"
+        return jsonify(result)
+
+def get_task_id(title: str, status: str):
+    try:
+        cursor = connect.cursor()
+        cursor.execute('SELECT task_id FROM task WHERE title = "{}" AND status = "{}";'.format(title, status))
+        cursor.close
+        connect.close
+        result = cursor.fetchone()
+        return result[0]
+    except Exception as error:
+        return jsonify(error)
+
 @app.route('/user/task/add', methods=['POST'])
 def create_task():
     result: dict = {}
@@ -63,7 +115,13 @@ def create_task():
             end = data['end']
             status = data['status']
             cursor = connect.cursor()
-            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s)', (title, begin, end, status))
+            cursor.execute('INSERT INTO task (title, begin, end, status) VALUES (%s, %s, %s, %s);', (title, begin, end, status))
+            connect.commit()
+            cursor.close
+            connect.close
+            task_id = get_task_id(title, status)
+            cursor = connect.cursor()
+            cursor.execute('INSERT INTO user_has_task (fk_user_id, fk_task_id) VALUES (%s, %s);', (session['id'], task_id))
             connect.commit()
             cursor.close
             connect.close
@@ -77,16 +135,6 @@ def create_task():
         result['error'] = "you must be logged in"
         return jsonify(result)
     return 0
-
-def get_task_result_json(res: str):
-    result: dict = {}
-    data: dict = {}
-    data['title'] = res[1]
-    data['begin'] = res[2]
-    data['end'] = res[3]
-    data['status'] = res[4]
-    result['result'] = data
-    return jsonify(result)
 
 @app.route('/user/task/<int:id>', methods=['GET'])
 def view_task_id(id: int):
@@ -238,4 +286,3 @@ def modify_task_id(id: int):
     else:
         result['error'] = "you must be logged in"
         return jsonify(result)
-    return
