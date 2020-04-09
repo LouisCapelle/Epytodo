@@ -1,60 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
-        <link rel="stylesheet" type="text/css" href="../static/templates.css">
+        <link rel="stylesheet" type="text/css" href="../static/to_do.css">
         <meta charset="utf-8">
         <title>&lt;Web&gt; EpyTodo</title>
     </head>
     <body>
-        <ul>
-            <form name="x" action="/home" method="get">
-                <li><a href="home">Home</a></li>
-            </form>
-            <form name="x" action="/" method="get">
-                <li style="float:right"><a href="/">Connection</a></li>
-            </form>
-            <form name="x" action="/add_user" method="get">
-                <li style="float:right"><a href="/add_user">Create account</a></li>
-            </form>
-            <form name="x" action="/to_do" method="get">
-                <li><a class="active" href="/to_do">To do</a></li>
-            </form>
-            </ul>
-        <br/><br/><br/><br/>
-        <h1>TO DO</h1>
-        <br/><br/><br/><br/><br/><br/>
-        <script src="../static/get_tasks.js"></script>
-        <script type="text/javascript">
-        get_tasks();
-        </script>
-        <div class="box_to_do">
-            <div class="to_do">
-            <br/><br/>
-                <fieldset>
-                    <legend>Ma to do list :</legend>
-                    <div><pre></pre>
-                        <input type="checkbox" id="coding" name="interest" value="coding">
-                        <label for="coding">Aller chercher Sloopy</label>
-                    </div>
-                    <div><pre></pre>
-                        <input type="checkbox" id="music" name="interest" value="music">
-                        <label for="music">Faire les courses</label>
-                    </div>
-                    <div><pre></pre>
-                        <input type="checkbox" id="music" name="interest" value="music">
-                            <label for="music">Appeler Mamie</label>
-                    </div>
-                    <div><pre></pre>
-                        <input type="checkbox" id="music" name="interest" value="music">
-                        <label for="music">Ranger ma chambre</label>
-                    </div>
-                    <div><pre></pre>
-                        <input type="checkbox" id="music" name="interest" value="music">
-                        <label for="music">Finir projet EpyTodo</label>
-                    </div>
-                </fieldset>
-            </list>
+        <div id="myDIV" class="header">
+            <h2 style="margin:5px">My To Do List</h2>
+            <input type="text" id="myInput" placeholder="You have to..">
+            <span onclick="newElement()" class="addBtn">Add</span>
         </div>
-        </div>
+        <ul id="myUL">
+        </ul> 
+    <script src="../static/to_do.js"></script>
     </body>
-</html>
