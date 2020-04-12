@@ -157,6 +157,41 @@ def get_user_id(username: str):
     connect.close
     return(id[0][0])
 
+@app.route('/user/task', methods=['GET'])
+def get_all_task_from_user():
+    pre_res: dict = {}
+    temp_res: dict = {}
+    result: dict = {}
+    data: dict = {}
+    i = 1;
+    if 'id' in session:
+        try:
+            cursor = connect.cursor()
+            cursor.execute('SELECT fk_task_id FROM user_has_task WHERE fk_user_id = {};'.format(session['id']));
+            temp = cursor.fetchall()
+            cursor.close
+            connect.close
+            result["result"] = "result"
+            for ids in temp:
+                cursor = connect.cursor()
+                cursor.execute("SELECT * FROM task WHERE task_id = '{}';".format(ids[0]))
+                temp = cursor.fetchone()
+                cursor.close
+                connect.close
+                data['title'] = temp[1]
+                data['begin'] = temp[2]
+                data['end'] = temp[3]
+                data['status'] = temp[4]
+                pre_res[i] = data
+                i += 1
+            result = pre_res
+            return jsonify(result)
+        except Exception as error:
+            return jsonify(error)
+    else:
+        result['error'] = "you must be logged in"
+        return jsonify(result)
+
 @app.route('/signin', methods=['POST'])
 def signin_user():
     result: dict = {}
